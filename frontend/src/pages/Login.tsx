@@ -1,148 +1,186 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { FileSearch, Mail, Lock, AlertCircle } from 'lucide-react';
-import ThemeToggle from '../components/ThemeToggle';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { FileSearch, Mail, Lock, AlertCircle } from "lucide-react";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
-    }));
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields.');
+      setError("Please fill in all fields.");
       return;
     }
 
     setLoading(true);
-    const toastId = toast.loading('Logging you in...');
+    const toastId = toast.loading("Logging you in...");
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000"
-      const response = await axios.post(`${API_URL}/api/auth/login`, formData);toast.success(response.data.message || 'Logged in successfully!', { id: toastId });
-      
-      // Save credentials & redirect
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      navigate('/dashboard');
+      const response = await axios.post(
+        `${API_URL}/api/auth/login`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      toast.success(
+        response.data.message || "Logged in successfully!",
+        {
+          id: toastId,
+        }
+      );
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.data.user)
+      );
+
+      navigate("/dashboard");
     } catch (err: any) {
-      const message = err.response?.data?.error || 'Login failed. Please check your credentials.';
+      const message =
+        err.response?.data?.error ||
+        "Login failed. Please check your credentials.";
+
       setError(message);
-      toast.error(message, { id: toastId });
+      toast.error(message, {
+        id: toastId,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-900 transition-colors duration-200 bg-grid-pattern">
-      {/* Top bar with logo and theme toggle */}
-      <header className="px-6 py-4 flex justify-between items-center bg-white/50 dark:bg-slate-950/20 backdrop-blur-sm">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-            <FileSearch className="h-4.5 w-4.5" />
+    <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-900">
+      <header className="px-6 py-4 flex justify-between items-center bg-white dark:bg-slate-900 shadow">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+            <FileSearch size={18} />
           </div>
-          <span className="font-extrabold text-lg text-slate-800 dark:text-white">AI Resume Analyzer</span>
+
+          <span className="font-bold text-lg">
+            AI Resume Analyzer
+          </span>
         </Link>
+
         <ThemeToggle />
       </header>
 
-      {/* Main card */}
-      <main className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xl shadow-indigo-100/50 dark:shadow-none transition-colors duration-200">
-          <div className="text-center space-y-2 mb-8">
-            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Log in to your account</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline font-bold">
-                Register
-              </Link>
-            </p>
-          </div>
+      <main className="flex flex-1 items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-8">
+
+          <h2 className="text-2xl font-bold text-center mb-2">
+            Login
+          </h2>
+
+          <p className="text-center text-gray-500 mb-6">
+            Login to continue
+          </p>
 
           {error && (
-            <div id="login-error" className="flex items-center space-x-2 p-4 mb-6 text-sm text-red-600 bg-red-50 dark:bg-red-950/20 dark:text-red-400 rounded-xl border border-red-100 dark:border-red-900">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <span>{error}</span>
+            <div className="mb-4 flex items-center gap-2 text-red-500 bg-red-100 p-3 rounded-lg">
+              <AlertCircle size={18} />
+              {error}
             </div>
           )}
 
-          <form id="login-form" onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5" htmlFor="email">
-                Email Address
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                  <Mail className="h-5 w-5" />
-                </span>
+              <label>Email</label>
+
+              <div className="relative mt-1">
+                <Mail
+                  className="absolute left-3 top-3 text-gray-400"
+                  size={18}
+                />
+
                 <input
-                  id="email"
-                  name="email"
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="name@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-250 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none text-sm text-slate-900 dark:text-white transition duration-150"
+                  className="w-full border rounded-lg py-2 pl-10 pr-3"
+                  placeholder="Enter email"
                 />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300" htmlFor="password">
-                  Password
-                </label>
-              </div>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                  <Lock className="h-5 w-5" />
-                </span>
+              <label>Password</label>
+
+              <div className="relative mt-1">
+                <Lock
+                  className="absolute left-3 top-3 text-gray-400"
+                  size={18}
+                />
+
                 <input
-                  id="password"
-                  name="password"
                   type="password"
+                  name="password"
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-250 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none text-sm text-slate-900 dark:text-white transition duration-150"
+                  className="w-full border rounded-lg py-2 pl-10 pr-3"
+                  placeholder="Enter password"
                 />
               </div>
             </div>
 
             <button
-              id="login-submit-btn"
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 font-bold text-sm transition shadow-lg shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-55 disabled:cursor-not-allowed"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold"
             >
-              {loading ? 'Logging In...' : 'Log In'}
+              {loading ? "Logging In..." : "Login"}
             </button>
+
           </form>
+
+          <p className="text-center mt-6">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-indigo-600 font-semibold"
+            >
+              Register
+            </Link>
+          </p>
+
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs text-slate-400">
-        &copy; 2026 AI Resume Analyzer. All rights reserved.
+      <footer className="text-center py-5 text-gray-400 text-sm">
+        © 2026 AI Resume Analyzer
       </footer>
     </div>
   );
