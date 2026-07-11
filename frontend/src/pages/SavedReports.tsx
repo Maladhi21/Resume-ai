@@ -14,9 +14,22 @@ export default function SavedReports() {
     const fetchResumes = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('/api/resumes', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const response = await axios.get(
+  `${API_URL}/api/resumes`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+const resumesData = Array.isArray(response.data)
+  ? response.data
+  : response.data.resumes || [];
+
         // Filtering saved / high-performing reports scoring 80+
         const highScoring = response.data.filter(
           (r: any) => r.analysisResult && r.analysisResult.overallScore >= 80
@@ -56,7 +69,7 @@ export default function SavedReports() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-slide-up">
-          {resumes.map((res) => {
+          {Array.isArray(resumes) && resumes.map((res) => {
             const date = new Date(res.uploadedAt).toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric',

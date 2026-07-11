@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 import toast from 'react-hot-toast';
 import {
   User,
@@ -11,7 +12,11 @@ import {
   X,
   AlertTriangle,
 } from 'lucide-react';
+
 import ThemeToggle from '../components/ThemeToggle';
+
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function ProfileSettings() {
   const [profile, setProfile] = useState({ name: '', email: '' });
@@ -29,9 +34,9 @@ export default function ProfileSettings() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('/api/auth/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(`${API_URL}/api/auth/profile`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
         setProfile({
           name: response.data.user.name,
           email: response.data.user.email,
@@ -57,7 +62,7 @@ export default function ProfileSettings() {
     const toastId = toast.loading('Updating profile details...');
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('/api/auth/profile', {
+      const response = await axios.put(`${API_URL}/api/auth/profile`, {
         name: profile.name,
         email: profile.email,
       }, {
@@ -82,7 +87,7 @@ export default function ProfileSettings() {
     const toastId = toast.loading('Updating security credentials...');
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('/api/auth/profile', {
+      const response = await axios.put(`${API_URL}/api/auth/profile`, {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
       }, {
@@ -106,7 +111,7 @@ export default function ProfileSettings() {
     const toastId = toast.loading('Deleting account permanently...');
     try {
       const token = localStorage.getItem('token');
-      await axios.delete('/api/auth/profile', {
+      const response = await axios.delete(`${API_URL}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success('Your account was successfully deleted.', { id: toastId });
