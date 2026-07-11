@@ -28,16 +28,31 @@ export default function Dashboard() {
   const fetchLatestResume = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/resumes', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.data && response.data.length > 0) {
-        // Sort by date to get latest
-        const sorted = response.data.sort(
-          (a: any, b: any) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-        );
-        setResume(sorted[0]);
-      }
+     const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const response = await axios.get(
+  `${API_URL}/api/resumes`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
+const resumes = Array.isArray(response.data)
+  ? response.data
+  : response.data.resumes || [];
+
+if (resumes.length > 0) {
+  const sorted = resumes.sort(
+    (a: any, b: any) =>
+      new Date(b.uploadedAt).getTime() -
+      new Date(a.uploadedAt).getTime()
+  );
+
+  setResume(sorted[0]);
+}
     } catch (err: any) {
       console.error('Error fetching resume:', err);
     } finally {
