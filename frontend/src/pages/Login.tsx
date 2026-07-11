@@ -34,8 +34,8 @@ export default function Login() {
     const toastId = toast.loading('Logging you in...');
 
     try {
-      const response = await axios.post('/api/auth/login', formData);
-      toast.success(response.data.message || 'Logged in successfully!', { id: toastId });
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000"
+      const response = await axios.post(`${API_URL}/api/auth/login`, formData);toast.success(response.data.message || 'Logged in successfully!', { id: toastId });
       
       // Save credentials & redirect
       localStorage.setItem('token', response.data.token);

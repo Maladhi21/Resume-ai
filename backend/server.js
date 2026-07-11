@@ -21,7 +21,7 @@ connectDB();
 // Middlewares
 
 app.use(cors({
-  origin: "https://resume-d780j8nsg-malu6.vercel.app",
+  origin: "https://resume-ai-one-eta.vercel.app",
   credentials: true
 }));
 app.use(express.json());
