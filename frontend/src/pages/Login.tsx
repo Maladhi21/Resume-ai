@@ -25,7 +25,7 @@ export default function Login() {
       [e.target.name]: e.target.value,
     });
   };
-
+   console.log("API_URL =", API_URL);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
