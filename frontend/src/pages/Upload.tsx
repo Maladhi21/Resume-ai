@@ -10,7 +10,8 @@ export default function Upload() {
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
-
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000";
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -69,11 +70,14 @@ export default function Upload() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/api/resumes/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
-        },
+     const response = await axios.post(
+  `${API_URL}/api/resumes/upload`,
+  formData,
+  {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`
+    },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 100));
           setProgress(percent);
