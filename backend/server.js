@@ -19,11 +19,22 @@ const PORT = process.env.BACKEND_PORT || 5000;
 connectDB();
 
 // Middlewares
+const allowedOrigins = [
+  "https://resume-ai-one-eta.vercel.app",
+  "https://resume-nsejlsez1-malu6.vercel.app"
+];
 
 app.use(cors({
-  origin: "https://resume-ai-one-eta.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
+
 app.use(express.json());
 
 // Routes
