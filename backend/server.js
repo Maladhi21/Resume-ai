@@ -19,7 +19,11 @@ const PORT = process.env.BACKEND_PORT || 5000;
 connectDB();
 
 // Middlewares
-app.use(cors());
+
+app.use(cors({
+  origin: "https://resume-d780j8nsg-malu6.vercel.app",
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
