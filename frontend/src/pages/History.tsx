@@ -25,11 +25,25 @@ export default function History() {
   const fetchResumes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/resumes', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setResumes(response.data);
-    } catch (err: any) {
+     const API_URL =
+      import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+    const response = await axios.get(
+      `${API_URL}/api/resumes`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const resumes =
+      Array.isArray(response.data)
+        ? response.data
+        : response.data.resumes || [];
+
+    setResumes(resumes);
+  }catch (err: any) {
       toast.error('Failed to load analysis history.');
     } finally {
       setLoading(false);
